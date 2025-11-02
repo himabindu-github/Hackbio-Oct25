@@ -12,7 +12,45 @@ For decades, researchers relied on bulk sequencing, which analyzes DNA or RNA fr
 Single-cell sequencing overcomes these limitations by studying thousands of cells individually. It allows scientists to trace how different cell types emerge, how they interact with each other and with their microenvironment, and how some cells adapt to survive therapy. This detailed view helps reveal the hidden drivers of resistance and progression, offering a more precise understanding of tumor evolution and guiding the development of targeted therapies.
 
 ## Insights from Case Studies
-Recent studies illustrate the power of single-cell approaches. In breast cancer, specific cell states were linked to tamoxifen resistance. In lung and colorectal cancers, tumor and immune cell communication was mapped, affecting therapy success. In esophageal cancer, immature cells were associated with poor response. In glioblastoma, stem-like cells drove recurrence, while in liver and pancreatic cancers, immune-suppressive environments allowed malignant cells to survive. These findings show how single-cell analysis uncovers mechanisms of resistance and guides precision therapy.
+
+Single-cell sequencing uncovers phenomena that bulk methods cannot, providing a detailed map of tumor evolution, resistance, metastasis, and microenvironmental interactions. These insights are essential for precision oncology.
+
+Several studies have demonstrated the power of single-cell sequencing to reveal the hidden aspects of tumor biology.
+
+### Therapy Resistance
+
+**Breast Cancer**  
+Single-cell RNA-seq and ATAC-seq studies of primary and tamoxifen-treated recurrent tumors identified rare therapy-resistant cell states and a 137-gene heterogeneity signature. Minor clones that exist before treatment expand after therapy, showing epithelial-mesenchymal transition and unique transcription programs. Bulk RNA-seq could not detect these rare resistant subclones.  
+
+**Lung Cancer**  
+Studies in non-small cell lung cancer discovered "mixed-lineage" tumor cells that express markers of multiple subtypes. These cells have a common clonal origin and are linked to poor prognosis. Bulk RNA-seq averages signals and misses these rare adaptive populations.
+
+These studies show how rare resistant clones survive therapy and drive relapse.
+
+### Metastatic Drivers
+
+**Lung Adenocarcinoma**  
+Single-cell analysis of primary and metastatic sites revealed rare subclones that dominate metastatic tumors.  
+
+**Breast Cancer**  
+Pre-existing minor clones were traced from the primary tumor to distant metastases, showing the origin of metastatic spread.
+
+Single-cell sequencing helps identify subclones responsible for metastasis, which bulk methods cannot resolve.
+
+### Microenvironmental Insights
+
+**Glioblastoma**  
+Single-cell and spatial transcriptomics studies showed that different malignant cell states occupy specific niches within tumors. Cells in the necrotic core displayed strong immunosuppressive signatures. Bulk RNA-seq cannot capture this spatial heterogeneity.  
+
+**Ovarian Cancer**  
+Single-cell profiling distinguished tumor, stromal, and immune cell populations and linked specific clusters to therapy response and immune evasion.
+
+These studies reveal how interactions with the microenvironment influence tumor progression and therapy outcomes.
+
+### Key Takeaways
+
+Single-cell sequencing identifies rare resistant clones and therapy-escape populations that bulk sequencing cannot detect. Tumor cells show clonal and cell-state plasticity that drives adaptation. Microenvironmental and spatial heterogeneity shape tumor evolution and response to therapy.
+
 
 ## Towards Personalized Cancer Treatment
 Single-cell sequencing is paving the way for more precise cancer treatment. By revealing each tumor’s unique cellular makeup, doctors can design targeted therapies, monitor tumor evolution in real time, and optimize immunotherapy strategies. Combining single-cell data with spatial mapping will further improve predictions of tumor behavior, ultimately allowing treatments tailored to each tumor’s evolving ecosystem.
