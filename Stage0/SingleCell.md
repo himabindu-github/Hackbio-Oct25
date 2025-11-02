@@ -1,7 +1,7 @@
 # What Single-Cell Sequencing Data Is Teaching Us About Cancer Evolution
 
 ## Introduction: Understanding Cancer
-Cancer is not a single disease but a group of conditions in which cells grow and divide uncontrollably. Tumors are composed of many different cell types that can change over time, adapt to their surroundings, and survive therapy. These changes make cancer difficult to treat. Studying how these cells behave is essential for developing better therapies and predicting which tumors will respond to treatment.
+Cancer is not a single disease but a group of conditions in which cells grow and divide uncontrollably often forming tumors. These tumors are composed of many different cell types that can change over time, adapt to their surroundings, and survive therapy. These changes make cancer difficult to treat. Studying how these cells behave is essential for developing better therapies and predicting which tumors will respond to treatment.
 
 ## Tumor Ecosystem: Diversity and Adaptation
 Tumors are more like complex ecosystems than uniform cell masses. Within a single tumor, cells can divide rapidly, remain dormant, adapt to harsh conditions, or resist treatment. This internal diversity, called intratumor heterogeneity, allows tumors to evolve under pressure. Some cells may hide from the immune system, alter their metabolism, or receive protection from nearby stromal cells. By viewing tumors as ecosystems, scientists can understand how different cells interact, survive, and contribute to therapy resistance.
