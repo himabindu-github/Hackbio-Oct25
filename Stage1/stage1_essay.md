@@ -2,7 +2,7 @@
 **Authors:** Amir Giladi, Ido Amit
 
 
-# Unlocking the Immune System with Single-Cell Genomics
+## Unlocking the Immune System with Single-Cell Genomics
 
 The immune system is a highly dynamic and diverse network of cells, constantly adapting to protect the body from infection, injury, and disease. Traditional approaches that analyze bulk populations of cells often miss rare or transitional states, masking critical functional diversity. Single-cell genomics has transformed this landscape, enabling researchers to study individual cells and uncover previously hidden cell types, states, and interactions. This approach has revealed new insights into T cells, microglia, and innate lymphoid cells, as well as their roles in infection, inflammation, and disease progression.
 
