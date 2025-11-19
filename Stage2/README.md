@@ -22,7 +22,7 @@ This project implements single-cell RNA-seq (scRNA-seq) analysis workflow using 
 
 🧬 What I Found
 
-The sample is dominated by unconventional lymphoid cells (γδ T cells, Nuocytes), with reduced neutrophils, monocytes, and B cells—a pattern not typical for healthy bone marrow. Expected bone-marrow lineages such as hematopoietic stem/progenitor cells, erythroid precursors, and megakaryocytes were not observed.
+The sample is dominated by unconventional lymphoid cells (γδ T cells, Nuocytes), with reduced neutrophils, monocytes, and B cells, a pattern not typical for healthy bone marrow. Expected bone-marrow lineages such as hematopoietic stem/progenitor cells, erythroid precursors, and megakaryocytes were not observed.
 
 The overall composition suggests the tissue is in a perturbed or activated immune state, consistent with viral infection or systemic inflammation, rather than healthy bone marrow.
 
