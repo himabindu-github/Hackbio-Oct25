@@ -21,7 +21,7 @@ This project implements single-cell RNA-seq (scRNA-seq) analysis workflow using 
 - Interpreted the biological meaning of the identified clusters
 
 
-🧬 What I Found
+## 🧬 What I Found
 The cell composition of the dataset does not match what is normally seen in healthy bone marrow. In bone marrow, we expect a broad mix of developing blood lineages, including hematopoietic stem and progenitor cells, erythroid precursors, megakaryocytes, and large numbers of neutrophils. These groups are not found in the data, and instead the sample is dominated by lymphoid immune cells such as γδ T cells, NK cell populations, and other mononuclear cells. This pattern is more consistent with a PBMC-like sample rather than marrow, because peripheral blood is enriched for mature immune cells and lacks the early developmental stages that are typical of bone marrow. Based on the types of cells detected and their proportions, the tissue resembles peripheral blood immune cells rather than a bone marrow environment. Validation with reference bone marrow datasets would be needed to confirm this interpretation.
 
 The dataset mainly contains mononuclear immune cells, similar to what we usually see in PBMC samples. We can identify a mix of innate and adaptive immune populations, including NK cells, monocytes, naïve B cells, T cells, and other lymphoid subsets. Innate immune cell populations, like, NK cells, appear more prominent than expected, which can happen when the immune system is actively responding to a stimulus. We also see changes in monocyte levels and variation in T-cell states, which are signs of cytokine signaling, antigen presentation, and early immune activation.
