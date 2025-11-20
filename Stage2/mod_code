@@ -1,0 +1,316 @@
+"""
+Single-cell RNA-seq Analysis Pipeline (Modular Version)
+------------------------------------------------------
+
+This script performs:
+
+1. Setup & data loading
+2. Preprocessing & QC
+3. Normalization & HVG selection
+4. Dimensionality reduction
+5. Clustering (multi-resolution)
+6. Annotation using decoupler
+7. Cell-type fraction calculation
+
+All steps follow your original logic exactly.
+"""
+
+# -----------------------------
+# 1. Import Required Libraries
+# -----------------------------
+
+def load_libraries():
+    """Import Python libraries with basic error handling."""
+    try:
+        import scanpy as sc
+        import anndata as ad
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+        import scrublet as scr
+        import decoupler as dc
+        return sc, ad, sns, plt, scr, dc
+    except Exception as e:
+        raise ImportError(f"Error importing libraries: {e}")
+
+sc, ad, sns, plt, scr, dc = load_libraries()
+
+
+# -----------------------------
+# 2. Load Dataset
+# -----------------------------
+
+def load_data(path):
+    """Load an .h5ad dataset into an AnnData object."""
+    try:
+        adata = sc.read_h5ad(path)
+        print(f"Loaded dataset with {adata.n_obs} cells and {adata.n_vars} genes.")
+        return adata
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File not found at {path}")
+    except Exception as e:
+        raise RuntimeError(f"Failed to load AnnData file: {e}")
+
+
+bone_marrow_adata = load_data("bone_marrow.h5ad")
+
+
+# -----------------------------
+# 3. Inspect Dataset
+# -----------------------------
+
+def inspect_data(adata):
+    """Print metadata and head of obs/var."""
+    print("\n--- Dataset Overview ---")
+    print(adata)
+
+    print("\n--- Observations Head (Cells) ---")
+    print(adata.obs.head())
+
+    print("\n--- Variables Head (Genes) ---")
+    print(adata.var.head())
+
+    return None
+
+inspect_data(bone_marrow_adata)
+
+
+# -----------------------------
+# 4. Preprocessing & QC
+# -----------------------------
+
+def add_qc_flags(adata):
+    """Identify mitochondrial, ribosomal, and hemoglobin genes."""
+    try:
+        adata.var_names_make_unique()
+        adata.obs_names_make_unique()
+
+        adata.var["MT"] = adata.var["feature_name"].str.startswith("MT-")
+        adata.var["ribo"] = adata.var["feature_name"].str.startswith(("RPS", "RPL"))
+        adata.var["hb"] = adata.var["feature_name"].str.startswith(("HBA", "HBB", "HBG"))
+        return adata
+    except Exception as e:
+        raise RuntimeError(f"Error marking QC gene categories: {e}")
+
+
+def calculate_qc_metrics(adata):
+    """Add QC metrics such as total_counts, n_genes, pct_counts_MT etc."""
+    try:
+        sc.pp.calculate_qc_metrics(
+            adata,
+            qc_vars=["MT", "ribo", "hb"],
+            log1p=True,
+            inplace=True
+        )
+        return adata
+    except Exception as e:
+        raise RuntimeError(f"QC metric calculation error: {e}")
+
+
+def filter_low_quality_cells(adata, min_genes=200, max_genes=4000, max_mt=5, min_cells=3):
+    """Apply QC thresholds and remove doublets."""
+
+    try:
+        # Filter rarely expressed genes
+        sc.pp.filter_genes(adata, min_cells=min_cells)
+
+        # Boolean mask for QC filtering
+        mask = (
+            (adata.obs["n_genes_by_counts"] >= min_genes) &
+            (adata.obs["n_genes_by_counts"] <= max_genes) &
+            (adata.obs["pct_counts_MT"] < max_mt)
+        )
+
+        adata = adata[mask].copy()
+        print(f"Remaining after QC: {adata.n_obs} cells, {adata.n_vars} genes.")
+
+        # Doublet detection
+        scrub = scr.Scrublet(adata.X)
+        scores, preds = scrub.scrub_doublets()
+
+        adata.obs["doublet_score"] = scores
+        adata.obs["predicted_doublet"] = preds
+
+        # Remove doublets
+        adata = adata[~adata.obs["predicted_doublet"]].copy()
+        adata.layers["counts"] = adata.X.copy()
+
+        return adata
+
+    except Exception as e:
+        raise RuntimeError(f"Error filtering QC cells: {e}")
+
+
+bone_marrow_adata = add_qc_flags(bone_marrow_adata)
+bone_marrow_adata = calculate_qc_metrics(bone_marrow_adata)
+bone_marrow_adata = filter_low_quality_cells(bone_marrow_adata)
+
+
+# -----------------------------
+# 5. Normalization & HVGs
+# -----------------------------
+
+def normalize_and_select_hvgs(adata, n_top=2000):
+    """Normalize counts, log-transform, and choose HVGs."""
+    try:
+        sc.pp.normalize_total(adata)
+        sc.pp.log1p(adata)
+        sc.pp.highly_variable_genes(adata, n_top_genes=n_top)
+        return adata
+    except Exception as e:
+        raise RuntimeError(f"Normalization/HVG selection error: {e}")
+
+
+bone_marrow_adata = normalize_and_select_hvgs(bone_marrow_adata)
+
+
+# -----------------------------
+# 6. Dimensionality Reduction
+# -----------------------------
+
+def run_pca(adata):
+    """Compute PCA and store results in AnnData."""
+    try:
+        sc.tl.pca(adata)
+        return adata
+    except Exception as e:
+        raise RuntimeError(f"PCA computation error: {e}")
+
+
+bone_marrow_adata = run_pca(bone_marrow_adata)
+
+
+# -----------------------------
+# 7. Clustering
+# -----------------------------
+
+def compute_neighbors_umap(adata):
+    """Compute neighbor graph and UMAP."""
+    try:
+        sc.pp.neighbors(adata)
+        sc.tl.umap(adata)
+        return adata
+    except Exception as e:
+        raise RuntimeError(f"Error computing neighbors/UMAP: {e}")
+
+
+bone_marrow_adata = compute_neighbors_umap(bone_marrow_adata)
+
+
+def run_leiden_multi(adata, resolutions):
+    """Run Leiden clustering at multiple resolutions."""
+    try:
+        for r in resolutions:
+            key = f"leiden_res{str(r).replace('.', '_')}"
+            sc.tl.leiden(
+                adata,
+                resolution=r,
+                flavor="igraph",
+                key_added=key,
+                n_iterations=2
+            )
+        return adata
+    except Exception as e:
+        raise RuntimeError(f"Error running Leiden: {e}")
+
+
+res_list = [0.02, 0.2, 0.5, 1.0]
+bone_marrow_adata = run_leiden_multi(bone_marrow_adata, res_list)
+
+
+# -----------------------------
+# 8. Annotation Using Decoupler
+# -----------------------------
+
+def prepare_markers():
+    """Retrieve PanglaoDB canonical markers."""
+    try:
+        markers = dc.op.resource("PanglaoDB", organism="human")
+        markers = markers[markers["canonical_marker"]]
+        markers = markers[~markers.duplicated(["cell_type", "genesymbol"])]
+        markers = markers.rename(columns={"cell_type": "source", "genesymbol": "target"})
+        return markers[["source", "target"]]
+    except Exception as e:
+        raise RuntimeError(f"Error retrieving markers: {e}")
+
+
+def run_ulm_scores(adata, markers):
+    """Compute ULM cell-type activity scores."""
+    try:
+        adata.var_names = adata.var["feature_name"]
+        dc.mt.ulm(adata, net=markers, tmin=3)
+        return adata
+    except Exception as e:
+        raise RuntimeError(f"Error running ULM scoring: {e}")
+
+
+markers = prepare_markers()
+bone_marrow_adata = run_ulm_scores(bone_marrow_adata, markers)
+
+
+def rank_markers(adata, leiden_key="leiden_res0_5"):
+    """Rank markers per cluster and map top gene to cluster IDs."""
+    try:
+        score = dc.pp.get_obsm(adata, key="score_ulm")
+
+        ranked = dc.tl.rankby_group(
+            score,
+            groupby=leiden_key,
+            reference="rest",
+            method="t-test_overestim_var"
+        )
+        ranked = ranked[ranked["stat"] > 0]
+
+        cluster_annotations = (
+            ranked.groupby("group")
+            .head(1)
+            .set_index("group")["name"]
+            .to_dict()
+        )
+
+        return cluster_annotations
+
+    except Exception as e:
+        raise RuntimeError(f"Error ranking markers: {e}")
+
+
+cluster_annotations = rank_markers(bone_marrow_adata)
+
+
+# -----------------------------
+# 9. Apply Manual Final Mapping
+# -----------------------------
+
+def apply_final_celltypes(adata):
+    """Use your manual mapping to label cell types."""
+    mapping = {
+        '0': 'Neutrophils',
+        '1': 'Gamma delta T cells',
+        '2': 'Nuocytes',
+        '3': 'NK cells',
+        '4': 'B cells naive',
+        '5': 'Platelets',
+        '6': 'Nuocytes',
+        '7': 'Plasma cells',
+        '8': 'Monocytes'
+    }
+    adata.obs["cell_type"] = adata.obs["leiden_res0_5"].map(mapping)
+    return adata
+
+
+bone_marrow_adata = apply_final_celltypes(bone_marrow_adata)
+
+
+# -----------------------------
+# 10. Calculate Fractions
+# -----------------------------
+
+def compute_fractions(adata):
+    """Return cell-type proportions."""
+    fractions = adata.obs["cell_type"].value_counts(normalize=True)
+    print("\n--- Cell Type Fractions ---")
+    for ct, frac in fractions.items():
+        print(f"{ct}: {frac:.3f}")
+    return fractions
+
+
+fractions = compute_fractions(bone_marrow_adata)
